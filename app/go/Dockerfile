@@ -3,4 +3,9 @@ FROM golang:1.21.3
 WORKDIR /app
 EXPOSE 1323
 
-CMD ["go", "run", "main.go"]
+RUN go install github.com/cosmtrek/air@latest
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+CMD ["air", "-c", ".air.toml"]

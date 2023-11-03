@@ -21,8 +21,10 @@ type ServerConfig struct {
 }
 
 type DBConfig struct {
-	Driver     string `default:"mysql"`
-	DataSource string `default:"root:@(db:3306)/app"`
+	Port int    `default:"3306"`
+	Host string `default:"db"`
+	Name string `default:"app"`
+	User string `default:"root"`
 }
 
 func Get() Config {

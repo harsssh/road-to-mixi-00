@@ -1,4 +1,4 @@
-FROM golang:1.17.6
+FROM golang:1.21.3
 
 WORKDIR /app
 EXPOSE 1323

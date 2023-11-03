@@ -21,14 +21,14 @@ const maxRetries = 5
 const retryDelay = 5 * time.Second
 
 func getDBConnection(c configs.DBConfig) (*gorm.DB, error) {
-    mysqlConfig := go_mysql.NewConfig()
+	mysqlConfig := go_mysql.NewConfig()
 	mysqlConfig.Net = "tcp"
-    mysqlConfig.Addr = fmt.Sprintf("%s:%d", c.Host, c.Port)
-    mysqlConfig.DBName = c.Name
-    mysqlConfig.User = c.User
-    mysqlConfig.ParseTime = true
+	mysqlConfig.Addr = fmt.Sprintf("%s:%d", c.Host, c.Port)
+	mysqlConfig.DBName = c.Name
+	mysqlConfig.User = c.User
+	mysqlConfig.ParseTime = true
 	mysqlConfig.Collation = "utf8mb4_unicode_ci"
-	
+
 	var err error
 	for i := 0; i < maxRetries; i++ {
 		db, err := gorm.Open(mysql.Open(mysqlConfig.FormatDSN()), &gorm.Config{})
@@ -38,7 +38,7 @@ func getDBConnection(c configs.DBConfig) (*gorm.DB, error) {
 		log.Printf("failed to connet to database")
 		time.Sleep(retryDelay)
 	}
-    return nil, err
+	return nil, err
 }
 
 func main() {
@@ -49,14 +49,14 @@ func main() {
 		panic(err)
 	}
 
-    userRepo := repository.NewUserRepository(db)
-    userService := services.NewUserService(userRepo)
-    userHandler := handlers.NewUserHandler(userService)
+	userRepo := repository.NewUserRepository(db)
+	userService := services.NewUserService(userRepo)
+	userHandler := handlers.NewUserHandler(userService)
 
 	e := echo.New()
 
 	e.GET("/", func(c echo.Context) error {
-        return c.String(http.StatusOK, "minimal_sns_app")
+		return c.String(http.StatusOK, "minimal_sns_app")
 	})
 	e.GET("/get_friend_list", userHandler.GetFriendList)
 	e.GET("/get_friend_of_friend_list", userHandler.GetFriendOfFriendList)

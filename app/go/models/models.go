@@ -1,19 +1,20 @@
 package models
 
 type User struct {
-    ID     uint64 `gorm:"column:id;primaryKey;autoIncrement"`
-	UserID int    `gorm:"column:user_id;not null"`
-	Name   string `gorm:"column:name;not null;size:64;default:''"`
+	ID      uint64  `gorm:"autoIncrement"`
+	UserID  int     `gorm:"not null"`
+	Name    string  `gorm:"not null;size:64;default:''"`
+	Friends []*User `gorm:"many2many:friend_link;joinForeignKey:User1ID;joinReferences:User2ID"`
 }
 
 type FriendLink struct {
-    ID      uint64 `gorm:"primaryKey;autoIncrement;column:id"`
-    User1ID int    `gorm:"column:user1_id;not null"`
-    User2ID int    `gorm:"column:user2_id;not null"`
+	ID      uint64 `gorm:"autoIncrement"`
+	User1ID int    `gorm:"not null"`
+	User2ID int    `gorm:"not null"`
 }
 
 type BlockList struct {
-    ID      uint64 `gorm:"primaryKey;autoIncrement;column:id"`
-    User1ID int    `gorm:"column:user1_id;not null"`
-    User2ID int    `gorm:"column:user2_id;not null"`
+	ID      uint64 `gorm:"autoIncrement"`
+	User1ID int    `gorm:"not null"`
+	User2ID int    `gorm:"not null"`
 }

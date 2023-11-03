@@ -10,7 +10,7 @@ import (
 )
 
 type UserHandler struct {
-	service *services.UserService
+	service services.IUserService
 }
 
 type FriendInfo struct {
@@ -18,7 +18,7 @@ type FriendInfo struct {
 	Name   string `json:"name"`
 }
 
-func NewUserHandler(s *services.UserService) *UserHandler {
+func NewUserHandler(s services.IUserService) *UserHandler {
 	return &UserHandler{service: s}
 }
 

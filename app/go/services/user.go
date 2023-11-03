@@ -6,6 +6,10 @@ type IUserRepository interface {
 	FindByUserID(int) (*models.User, error)
 }
 
+type IUserService interface {
+	GetFriendList(int) ([]*models.User, error)
+}
+
 type UserService struct {
 	repo IUserRepository
 }

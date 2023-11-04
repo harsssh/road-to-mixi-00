@@ -1,12 +1,9 @@
 package handlers
 
 import (
-	"errors"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"problem1/services"
-	"strconv"
-
-	"github.com/labstack/echo/v4"
 )
 
 type UserHandler struct {
@@ -23,57 +20,11 @@ func NewUserHandler(s services.IUserService) *UserHandler {
 }
 
 func (h *UserHandler) GetFriendList(c echo.Context) error {
-	uidString := c.QueryParam("id")
-	uid, err := strconv.Atoi(uidString)
-	if err != nil {
-		return c.String(http.StatusBadRequest, "invalid id")
-	}
-
-	friends, err := h.service.GetFriendList(uid)
-	if err != nil {
-		if errors.Is(err, services.ErrUserNotFound) {
-			return c.String(http.StatusNotFound, "user not found")
-		} else {
-			return c.String(http.StatusInternalServerError, "internal server error")
-		}
-	}
-
-	friendInfoList := make([]*FriendInfo, len(friends))
-	for i, friend := range friends {
-		friendInfoList[i] = &FriendInfo{
-			UserID: friend.UserID,
-			Name:   friend.Name,
-		}
-	}
-	return c.JSON(http.StatusOK, friendInfoList)
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *UserHandler) GetFriendOfFriendList(c echo.Context) error {
-	uidString := c.QueryParam("id")
-	uid, err := strconv.Atoi(uidString)
-	if err != nil {
-		return c.String(http.StatusBadRequest, "invalid id")
-	}
-
-	friends, err := h.service.GetFriendOfFriendList(uid)
-	if err != nil {
-		if errors.Is(err, services.ErrUserNotFound) {
-			return c.String(http.StatusNotFound, "user not found")
-		} else {
-			return c.String(http.StatusInternalServerError, "internal server error")
-		}
-	}
-
-	friendInfoList := make([]*FriendInfo, len(friends))
-	for _, f := range friends {
-		for _, fof := range f.Friends {
-			friendInfoList = append(friendInfoList, &FriendInfo{
-				UserID: fof.UserID,
-				Name:   fof.Name,
-			})
-		}
-	}
-	return c.JSON(http.StatusOK, friendInfoList)
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *UserHandler) GetFriendOfFriendListPaging(c echo.Context) error {

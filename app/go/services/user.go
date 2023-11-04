@@ -1,16 +1,8 @@
 package services
 
-import "problem1/models"
-
-type IUserRepository interface {
-	FindByUserIDWithFriends(int) (*models.User, error)
-	FindFriendsByUserIDWithFriends(int) ([]*models.User, error)
-}
-
-type IUserService interface {
-	GetFriendList(int) ([]*models.User, error)
-	GetFriendOfFriendList(int) ([]*models.User, error)
-}
+import (
+	"problem1/models"
+)
 
 type UserService struct {
 	repo IUserRepository
@@ -20,18 +12,17 @@ func NewUserService(r IUserRepository) *UserService {
 	return &UserService{repo: r}
 }
 
-func (s *UserService) GetFriendList(uid int) ([]*models.User, error) {
-	user, err := s.repo.FindByUserIDWithFriends(uid)
-	if err != nil {
-		return nil, err
-	}
-	return user.Friends, nil
+func (u *UserService) GetFriendsByUserID(userID int) ([]*models.User, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
-func (s *UserService) GetFriendOfFriendList(uid int) ([]*models.User, error) {
-	user, err := s.repo.FindFriendsByUserIDWithFriends(uid)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+func (u *UserService) GetFriendsOfFriendsByUserID(userID int) ([]*models.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (u *UserService) GetFriendsOfFriendsPagingByUserID(userID int, page int, limit int) ([]*models.User, error) {
+	//TODO implement me
+	panic("implement me")
 }

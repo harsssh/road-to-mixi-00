@@ -49,7 +49,31 @@ func (h *UserHandler) GetFriendList(c echo.Context) error {
 }
 
 func (h *UserHandler) GetFriendOfFriendList(c echo.Context) error {
-	return c.NoContent(http.StatusOK)
+	uidString := c.QueryParam("id")
+	uid, err := strconv.Atoi(uidString)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "invalid id")
+	}
+
+	friends, err := h.service.GetFriendOfFriendList(uid)
+	if err != nil {
+		if errors.Is(err, services.ErrUserNotFound) {
+			return c.String(http.StatusNotFound, "user not found")
+		} else {
+			return c.String(http.StatusInternalServerError, "internal server error")
+		}
+	}
+
+	friendInfoList := make([]*FriendInfo, len(friends))
+	for _, f := range friends {
+		for _, fof := range f.Friends {
+			friendInfoList = append(friendInfoList, &FriendInfo{
+				UserID: fof.UserID,
+				Name:   fof.Name,
+			})
+		}
+	}
+	return c.JSON(http.StatusOK, friendInfoList)
 }
 
 func (h *UserHandler) GetFriendOfFriendListPaging(c echo.Context) error {

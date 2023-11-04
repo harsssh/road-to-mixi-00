@@ -11,9 +11,13 @@ import (
 )
 
 func TestUserHandler_GetFriendList(t *testing.T) {
+	data := map[int]*models.User{
+		1: {UserID: 1, Name: "A"},
+		2: {UserID: 2, Name: "B"},
+	}
 	tests := []struct {
 		name           string
-		data           []*models.User
+		data           map[int]*models.User
 		query          string
 		expectedStatus int
 		expectedBody   string
@@ -35,11 +39,18 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		},
 		{
 			name:           "found",
-			data:           []*models.User{{UserID: 1, Name: "A"}, {UserID: 2, Name: "B"}},
+			data:           data,
 			query:          "id=1",
 			expectedStatus: http.StatusOK,
 			expectedBody:   `[{"user_id":1,"name":"A"},{"user_id":2,"name":"B"}]`,
 			checkBody:      true,
+		},
+		{
+			name:           "not found",
+			data:           data,
+			query:          "id=3",
+			expectedStatus: http.StatusNotFound,
+			checkBody:      false,
 		},
 	}
 

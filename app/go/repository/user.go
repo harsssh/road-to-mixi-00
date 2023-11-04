@@ -25,3 +25,13 @@ func (r *UserRepository) FindByUserIDWithFriends(uid int) (*models.User, error) 
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) FindFriendsByUserIDWithFriends(uid int) ([]*models.User, error) {
+	var user models.User
+	if err := r.db.Preload("Friends.Friends").First(&user, "user_id = ?", uid).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, services.ErrUserNotFound
+		}
+	}
+	return user.Friends, nil
+}

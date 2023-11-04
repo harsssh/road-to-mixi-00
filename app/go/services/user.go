@@ -3,7 +3,7 @@ package services
 import "problem1/models"
 
 type IUserRepository interface {
-	FindByUserID(int) (*models.User, error)
+	FindByUserIDWithFriends(int) (*models.User, error)
 }
 
 type IUserService interface {
@@ -19,7 +19,7 @@ func NewUserService(r IUserRepository) *UserService {
 }
 
 func (s *UserService) GetFriendList(uid int) ([]*models.User, error) {
-	user, err := s.repo.FindByUserID(uid)
+	user, err := s.repo.FindByUserIDWithFriends(uid)
 	if err != nil {
 		return nil, err
 	}

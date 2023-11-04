@@ -16,7 +16,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db}
 }
 
-func (r *UserRepository) FindByUserID(uid int) (*models.User, error) {
+func (r *UserRepository) FindByUserIDWithFriends(uid int) (*models.User, error) {
 	var user models.User
 	if err := r.db.Preload("Friends").First(&user, "user_id = ?", uid).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

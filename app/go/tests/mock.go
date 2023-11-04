@@ -25,7 +25,7 @@ func (s *MockUserService) GetFriendList(_ int) ([]*models.User, error) {
 	return s.data, nil
 }
 
-func (r *MockUserRepository) FindByUserID(uid int) (*models.User, error) {
+func (r *MockUserRepository) FindByUserIDWithFriends(uid int) (*models.User, error) {
 	if user, ok := r.data[uid]; ok {
 		return user, nil
 	}

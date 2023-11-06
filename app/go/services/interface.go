@@ -11,7 +11,7 @@ type IUserRepository interface {
 
 //go:generate moq -out ./mock.go . IUserService
 type IUserService interface {
-	GetFriendsByUserID(userID int) ([]*models.User, error)
-	GetFriendsOfFriendsByUserID(userID int) ([]*models.User, error)
-	GetFriendsOfFriendsPagingByUserID(userID int, page int, limit int) ([]*models.User, error)
+	GetFriendList(userID int) ([]*models.User, error)
+	GetFriendOfFriendList(userID int) ([]*models.User, error)
+	GetFriendOfFriendListPaging(userID int, page int, limit int) ([]*models.User, error)
 }

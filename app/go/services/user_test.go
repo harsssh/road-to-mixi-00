@@ -74,7 +74,7 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 			u := &UserService{
 				repo: tt.fields.repo,
 			}
-			got, err := u.GetFriendsByUserID(tt.args.userID)
+			got, err := u.GetFriendList(tt.args.userID)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -150,7 +150,7 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 			u := &UserService{
 				repo: tt.fields.repo,
 			}
-			got, err := u.GetFriendsOfFriendsByUserID(tt.args.userID)
+			got, err := u.GetFriendOfFriendList(tt.args.userID)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -233,7 +233,7 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 			u := &UserService{
 				repo: tt.fields.repo,
 			}
-			got, err := u.GetFriendsOfFriendsPagingByUserID(tt.args.userID, tt.args.page, tt.args.limit)
+			got, err := u.GetFriendOfFriendListPaging(tt.args.userID, tt.args.page, tt.args.limit)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

@@ -12,17 +12,17 @@ func NewUserService(r IUserRepository) *UserService {
 	return &UserService{repo: r}
 }
 
-func (u *UserService) GetFriendsByUserID(userID int) ([]*models.User, error) {
+func (u *UserService) GetFriendList(userID int) ([]*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u *UserService) GetFriendsOfFriendsByUserID(userID int) ([]*models.User, error) {
+func (u *UserService) GetFriendOfFriendList(userID int) ([]*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u *UserService) GetFriendsOfFriendsPagingByUserID(userID int, page int, limit int) ([]*models.User, error) {
+func (u *UserService) GetFriendOfFriendListPaging(userID int, page int, limit int) ([]*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }

@@ -17,15 +17,14 @@ const TotalUsersOfMockRepository = 6
 // blocked: (1, 5)
 func getUserRepositoryMock() (IUserRepository, []*models.User) {
 	users := make([]*models.User, TotalUsersOfMockRepository)
-	for i, _ := range users {
+	for i := range users {
 		users[i] = &models.User{ID: uint64(i), UserID: i, Name: "user" + strconv.Itoa(i)}
 	}
 	users[1].Friends = []*models.User{users[2], users[3]}
-	users[1].Blocks = []*models.User{users[4]}
+	users[1].Blocks = []*models.User{users[5]}
 	users[2].Friends = []*models.User{users[1], users[3], users[4], users[5]}
 	users[3].Friends = []*models.User{users[1], users[2]}
 	users[4].Friends = []*models.User{users[2]}
-	users[5].Friends = []*models.User{users[2]}
 	return &repository.IUserRepositoryMock{
 		FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
 			if userID < 0 || userID >= TotalUsersOfMockRepository {
@@ -46,11 +45,17 @@ func getUserRepositoryMock() (IUserRepository, []*models.User) {
 			return users[userID].Blocks, nil
 		},
 		FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+			if userID == 0 {
+				return []*models.User{}, nil
+			}
 			return []*models.User{users[2], users[3], users[4], users[5]}, nil
 		},
 		FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc: func(
 			userID int, excludedUserIDs []int, page int, limit int,
 		) ([]*models.User, error) {
+			if userID == 0 {
+				return []*models.User{}, nil
+			}
 			return []*models.User{users[4]}, nil
 		},
 	}, users

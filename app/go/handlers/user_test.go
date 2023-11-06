@@ -321,7 +321,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 			e := echo.New()
 			req, rec := tt.prepare()
 			c := e.NewContext(req, rec)
-			require.NoError(t, h.GetFriendList(c))
+			require.NoError(t, h.GetFriendOfFriendList(c))
 			assert.Equal(t, tt.want.status, rec.Code)
 			if tt.want.checkBody {
 				assert.JSONEq(t, tt.want.body, rec.Body.String())
@@ -360,7 +360,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(
 					http.MethodGet,
-					"/get_friend_of_friend_list_paging?id=1?page=1&limit=3",
+					"/get_friend_of_friend_list_paging?id=1&page=1&limit=3",
 					nil,
 				)
 				rec := httptest.NewRecorder()
@@ -522,6 +522,44 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 				checkBody: false,
 			},
 		},
+		{
+			name: "page 0",
+			fields: fields{
+				service: &services.IUserServiceMock{},
+			},
+			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
+				req := httptest.NewRequest(
+					http.MethodGet,
+					"/get_friend_of_friend_list_paging?id=1&page=0&limit=3",
+					nil,
+				)
+				rec := httptest.NewRecorder()
+				return req, rec
+			},
+			want: response{
+				status:    http.StatusBadRequest,
+				checkBody: false,
+			},
+		},
+		{
+			name: "limit 0",
+			fields: fields{
+				service: &services.IUserServiceMock{},
+			},
+			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
+				req := httptest.NewRequest(
+					http.MethodGet,
+					"/get_friend_of_friend_list_paging?id=1&page=1&limit=0",
+					nil,
+				)
+				rec := httptest.NewRecorder()
+				return req, rec
+			},
+			want: response{
+				status:    http.StatusBadRequest,
+				checkBody: false,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -531,7 +569,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			e := echo.New()
 			req, rec := tt.prepare()
 			c := e.NewContext(req, rec)
-			require.NoError(t, h.GetFriendList(c))
+			require.NoError(t, h.GetFriendOfFriendListPaging(c))
 			assert.Equal(t, tt.want.status, rec.Code)
 			if tt.want.checkBody {
 				assert.JSONEq(t, tt.want.body, rec.Body.String())

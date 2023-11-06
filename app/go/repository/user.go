@@ -18,12 +18,22 @@ func (u *UserRepository) FindFriendsByUserID(userID int) ([]*models.User, error)
 	panic("implement me")
 }
 
+func (u *UserRepository) FindBlockedUsersByUserID(userID int) ([]*models.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (u *UserRepository) FindFriendsOfFriendsByUserID(userID int) ([]*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (u *UserRepository) FindFriendsOfFriendsPagingByUserID(userID int, page int, limit int) ([]*models.User, error) {
+func (u *UserRepository) FindUsersByIDs(userIDs []int) ([]*models.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (u *UserRepository) FindUsersByIDsPaging(userIDs []int, page int, limit int) ([]*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }

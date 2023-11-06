@@ -1,8 +1,11 @@
 package services
 
 import (
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"problem1/models"
-	"reflect"
+	"problem1/repository"
 	"testing"
 )
 
@@ -20,7 +23,51 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 		want    []*models.User
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+						return []*models.User{
+							{ID: 2, Name: "User2", Friends: nil},
+							{ID: 3, Name: "User3", Friends: nil},
+						}, nil
+					},
+				},
+			},
+			args: args{userID: 1},
+			want: []*models.User{
+				{ID: 2, Name: "User2", Friends: nil},
+				{ID: 3, Name: "User3", Friends: nil},
+			},
+			wantErr: false,
+		},
+		{
+			name: "no user",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+						return nil, ErrUserNotFound
+					},
+				},
+			},
+			args:    args{userID: 1},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "no friends",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+						return []*models.User{}, nil
+					},
+				},
+			},
+			args:    args{userID: 1},
+			want:    []*models.User{},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -28,13 +75,12 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 				repo: tt.fields.repo,
 			}
 			got, err := u.GetFriendsByUserID(tt.args.userID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetFriendsByUserID() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetFriendsByUserID() got = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -53,7 +99,51 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 		want    []*models.User
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+						return []*models.User{
+							{ID: 2, Name: "User2", Friends: nil},
+							{ID: 3, Name: "User3", Friends: nil},
+						}, nil
+					},
+				},
+			},
+			args: args{userID: 1},
+			want: []*models.User{
+				{ID: 2, Name: "User2", Friends: nil},
+				{ID: 3, Name: "User3", Friends: nil},
+			},
+			wantErr: false,
+		},
+		{
+			name: "no user",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+						return nil, ErrUserNotFound
+					},
+				},
+			},
+			args:    args{userID: 1},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "no friends",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+						return []*models.User{}, nil
+					},
+				},
+			},
+			args:    args{userID: 1},
+			want:    []*models.User{},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -61,18 +151,28 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 				repo: tt.fields.repo,
 			}
 			got, err := u.GetFriendsOfFriendsByUserID(tt.args.userID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetFriendsOfFriendsByUserID() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetFriendsOfFriendsByUserID() got = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
 
 func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
+	generateUsers := func(n int) []*models.User {
+		var users []*models.User
+		for i := 0; i < n; i++ {
+			users = append(users, &models.User{
+				ID:      uint64(i),
+				Name:    fmt.Sprintf("User%d", i),
+				Friends: nil,
+			})
+		}
+		return users
+	}
 	type fields struct {
 		repo IUserRepository
 	}
@@ -88,7 +188,45 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 		want    []*models.User
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsOfFriendsPagingByUserIDFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+						return generateUsers(limit), nil
+					},
+				},
+			},
+			args:    args{userID: 1, page: 1, limit: 5},
+			want:    generateUsers(5),
+			wantErr: false,
+		},
+		{
+			name: "no user",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsOfFriendsPagingByUserIDFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+						return nil, ErrUserNotFound
+					},
+				},
+			},
+			args:    args{userID: 1, page: 1, limit: 5},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "no friends",
+			fields: fields{
+				repo: &repository.IUserRepositoryMock{
+					FindFriendsOfFriendsPagingByUserIDFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+						return []*models.User{}, nil
+					},
+				},
+			},
+			args:    args{},
+			want:    []*models.User{},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -96,13 +234,12 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 				repo: tt.fields.repo,
 			}
 			got, err := u.GetFriendsOfFriendsPagingByUserID(tt.args.userID, tt.args.page, tt.args.limit)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetFriendsOfFriendsPagingByUserID() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetFriendsOfFriendsPagingByUserID() got = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

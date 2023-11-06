@@ -48,25 +48,10 @@ func getUserRepositoryMock() (IUserRepository, []*models.User) {
 		FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
 			return []*models.User{users[2], users[3], users[4], users[5]}, nil
 		},
-		FindUsersByIDsFunc: func(userIDs []int) ([]*models.User, error) {
-			result := make([]*models.User, 0, len(userIDs))
-			for _, id := range userIDs {
-				if id < 0 || id >= TotalUsersOfMockRepository {
-					continue
-				}
-				result = append(result, users[id])
-			}
-			return result, nil
-		},
-		FindUsersByIDsPagingFunc: func(userIDs []int, page int, limit int) ([]*models.User, error) {
-			result := make([]*models.User, 0, len(userIDs))
-			for _, id := range userIDs {
-				if id < 1 || id >= TotalUsersOfMockRepository {
-					continue
-				}
-				result = append(result, users[id])
-			}
-			return result, nil
+		FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc: func(
+			userID int, excludedUserIDs []int, page int, limit int,
+		) ([]*models.User, error) {
+			return []*models.User{users[4]}, nil
 		},
 	}, users
 }

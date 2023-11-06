@@ -23,11 +23,8 @@ import (
 //			FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
 //				panic("mock out the FindFriendsOfFriendsByUserID method")
 //			},
-//			FindUsersByIDsFunc: func(userIDs []int) ([]*models.User, error) {
-//				panic("mock out the FindUsersByIDs method")
-//			},
-//			FindUsersByIDsPagingFunc: func(userIDs []int, page int, limit int) ([]*models.User, error) {
-//				panic("mock out the FindUsersByIDsPaging method")
+//			FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc: func(userID int, excludedUserIDs []int, page int, limit int) ([]*models.User, error) {
+//				panic("mock out the FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination method")
 //			},
 //		}
 //
@@ -45,11 +42,8 @@ type IUserRepositoryMock struct {
 	// FindFriendsOfFriendsByUserIDFunc mocks the FindFriendsOfFriendsByUserID method.
 	FindFriendsOfFriendsByUserIDFunc func(userID int) ([]*models.User, error)
 
-	// FindUsersByIDsFunc mocks the FindUsersByIDs method.
-	FindUsersByIDsFunc func(userIDs []int) ([]*models.User, error)
-
-	// FindUsersByIDsPagingFunc mocks the FindUsersByIDsPaging method.
-	FindUsersByIDsPagingFunc func(userIDs []int, page int, limit int) ([]*models.User, error)
+	// FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc mocks the FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination method.
+	FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc func(userID int, excludedUserIDs []int, page int, limit int) ([]*models.User, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -68,26 +62,22 @@ type IUserRepositoryMock struct {
 			// UserID is the userID argument value.
 			UserID int
 		}
-		// FindUsersByIDs holds details about calls to the FindUsersByIDs method.
-		FindUsersByIDs []struct {
-			// UserIDs is the userIDs argument value.
-			UserIDs []int
-		}
-		// FindUsersByIDsPaging holds details about calls to the FindUsersByIDsPaging method.
-		FindUsersByIDsPaging []struct {
-			// UserIDs is the userIDs argument value.
-			UserIDs []int
+		// FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination holds details about calls to the FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination method.
+		FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination []struct {
+			// UserID is the userID argument value.
+			UserID int
+			// ExcludedUserIDs is the excludedUserIDs argument value.
+			ExcludedUserIDs []int
 			// Page is the page argument value.
 			Page int
 			// Limit is the limit argument value.
 			Limit int
 		}
 	}
-	lockFindBlockedUsersByUserID     sync.RWMutex
-	lockFindFriendsByUserID          sync.RWMutex
-	lockFindFriendsOfFriendsByUserID sync.RWMutex
-	lockFindUsersByIDs               sync.RWMutex
-	lockFindUsersByIDsPaging         sync.RWMutex
+	lockFindBlockedUsersByUserID                                     sync.RWMutex
+	lockFindFriendsByUserID                                          sync.RWMutex
+	lockFindFriendsOfFriendsByUserID                                 sync.RWMutex
+	lockFindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination sync.RWMutex
 }
 
 // FindBlockedUsersByUserID calls FindBlockedUsersByUserIDFunc.
@@ -186,74 +176,46 @@ func (mock *IUserRepositoryMock) FindFriendsOfFriendsByUserIDCalls() []struct {
 	return calls
 }
 
-// FindUsersByIDs calls FindUsersByIDsFunc.
-func (mock *IUserRepositoryMock) FindUsersByIDs(userIDs []int) ([]*models.User, error) {
-	if mock.FindUsersByIDsFunc == nil {
-		panic("IUserRepositoryMock.FindUsersByIDsFunc: method is nil but IUserRepository.FindUsersByIDs was just called")
+// FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination calls FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc.
+func (mock *IUserRepositoryMock) FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination(userID int, excludedUserIDs []int, page int, limit int) ([]*models.User, error) {
+	if mock.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc == nil {
+		panic("IUserRepositoryMock.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc: method is nil but IUserRepository.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination was just called")
 	}
 	callInfo := struct {
-		UserIDs []int
+		UserID          int
+		ExcludedUserIDs []int
+		Page            int
+		Limit           int
 	}{
-		UserIDs: userIDs,
+		UserID:          userID,
+		ExcludedUserIDs: excludedUserIDs,
+		Page:            page,
+		Limit:           limit,
 	}
-	mock.lockFindUsersByIDs.Lock()
-	mock.calls.FindUsersByIDs = append(mock.calls.FindUsersByIDs, callInfo)
-	mock.lockFindUsersByIDs.Unlock()
-	return mock.FindUsersByIDsFunc(userIDs)
+	mock.lockFindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination.Lock()
+	mock.calls.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination = append(mock.calls.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination, callInfo)
+	mock.lockFindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination.Unlock()
+	return mock.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc(userID, excludedUserIDs, page, limit)
 }
 
-// FindUsersByIDsCalls gets all the calls that were made to FindUsersByIDs.
+// FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationCalls gets all the calls that were made to FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination.
 // Check the length with:
 //
-//	len(mockedIUserRepository.FindUsersByIDsCalls())
-func (mock *IUserRepositoryMock) FindUsersByIDsCalls() []struct {
-	UserIDs []int
+//	len(mockedIUserRepository.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationCalls())
+func (mock *IUserRepositoryMock) FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationCalls() []struct {
+	UserID          int
+	ExcludedUserIDs []int
+	Page            int
+	Limit           int
 } {
 	var calls []struct {
-		UserIDs []int
+		UserID          int
+		ExcludedUserIDs []int
+		Page            int
+		Limit           int
 	}
-	mock.lockFindUsersByIDs.RLock()
-	calls = mock.calls.FindUsersByIDs
-	mock.lockFindUsersByIDs.RUnlock()
-	return calls
-}
-
-// FindUsersByIDsPaging calls FindUsersByIDsPagingFunc.
-func (mock *IUserRepositoryMock) FindUsersByIDsPaging(userIDs []int, page int, limit int) ([]*models.User, error) {
-	if mock.FindUsersByIDsPagingFunc == nil {
-		panic("IUserRepositoryMock.FindUsersByIDsPagingFunc: method is nil but IUserRepository.FindUsersByIDsPaging was just called")
-	}
-	callInfo := struct {
-		UserIDs []int
-		Page    int
-		Limit   int
-	}{
-		UserIDs: userIDs,
-		Page:    page,
-		Limit:   limit,
-	}
-	mock.lockFindUsersByIDsPaging.Lock()
-	mock.calls.FindUsersByIDsPaging = append(mock.calls.FindUsersByIDsPaging, callInfo)
-	mock.lockFindUsersByIDsPaging.Unlock()
-	return mock.FindUsersByIDsPagingFunc(userIDs, page, limit)
-}
-
-// FindUsersByIDsPagingCalls gets all the calls that were made to FindUsersByIDsPaging.
-// Check the length with:
-//
-//	len(mockedIUserRepository.FindUsersByIDsPagingCalls())
-func (mock *IUserRepositoryMock) FindUsersByIDsPagingCalls() []struct {
-	UserIDs []int
-	Page    int
-	Limit   int
-} {
-	var calls []struct {
-		UserIDs []int
-		Page    int
-		Limit   int
-	}
-	mock.lockFindUsersByIDsPaging.RLock()
-	calls = mock.calls.FindUsersByIDsPaging
-	mock.lockFindUsersByIDsPaging.RUnlock()
+	mock.lockFindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination.RLock()
+	calls = mock.calls.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination
+	mock.lockFindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination.RUnlock()
 	return calls
 }

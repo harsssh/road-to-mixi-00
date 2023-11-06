@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"problem1/models"
 	"problem1/services"
+	"problem1/services/mocks"
 	"testing"
 )
 
@@ -30,7 +31,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendListFunc: func(userID int) ([]*models.User, error) {
 						return []*models.User{
 							{UserID: 2, Name: "User2"},
@@ -53,7 +54,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		{
 			name: "no id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(http.MethodGet, "/get_friend_list", nil)
@@ -68,7 +69,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		{
 			name: "invalid id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(http.MethodGet, "/get_friend_list?id=invalid", nil)
@@ -83,7 +84,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		{
 			name: "negative id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(http.MethodGet, "/get_friend_list?id=-1", nil)
@@ -98,7 +99,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		{
 			name: "no user",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendListFunc: func(userID int) ([]*models.User, error) {
 						return nil, services.ErrUserNotFound
 					},
@@ -117,7 +118,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		{
 			name: "no friends",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendListFunc: func(userID int) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
@@ -137,7 +138,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 		{
 			name: "service error",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendListFunc: func(userID int) ([]*models.User, error) {
 						return nil, fmt.Errorf("error")
 					},
@@ -189,7 +190,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
 						return []*models.User{
 							{UserID: 2, Name: "User2"},
@@ -212,7 +213,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 		{
 			name: "no id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(http.MethodGet, "/get_friend_of_friend_list", nil)
@@ -227,7 +228,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 		{
 			name: "invalid id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(http.MethodGet, "/get_friend_of_friend_list?id=invalid", nil)
@@ -242,7 +243,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 		{
 			name: "negative id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(http.MethodGet, "/get_friend_of_friend_list?id=-1", nil)
@@ -257,7 +258,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 		{
 			name: "no user",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
 						return nil, services.ErrUserNotFound
 					},
@@ -276,7 +277,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 		{
 			name: "no friends",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
@@ -296,7 +297,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 		{
 			name: "service error",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
 						return nil, fmt.Errorf("error")
 					},
@@ -348,7 +349,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
 						return []*models.User{
 							{UserID: 2, Name: "User2"},
@@ -375,7 +376,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "no id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(
@@ -394,7 +395,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "invalid id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(
@@ -413,7 +414,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "negative id",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(
@@ -432,7 +433,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "no user",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
 						return nil, services.ErrUserNotFound
 					},
@@ -455,7 +456,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "no friends",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
@@ -479,7 +480,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "service error",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
 						return nil, fmt.Errorf("error")
 					},
@@ -502,7 +503,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "default page and limit",
 			fields: fields{
-				service: &services.IUserServiceMock{
+				service: &mocks.IUserServiceMock{
 					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
@@ -525,7 +526,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "page 0",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(
@@ -544,7 +545,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 		{
 			name: "limit 0",
 			fields: fields{
-				service: &services.IUserServiceMock{},
+				service: &mocks.IUserServiceMock{},
 			},
 			prepare: func() (*http.Request, *httptest.ResponseRecorder) {
 				req := httptest.NewRequest(

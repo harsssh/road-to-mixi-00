@@ -36,7 +36,7 @@ func (u *UserService) getUsersToExcludeForFriendsOfFriends(userID int) ([]*model
 	if err != nil {
 		return nil, err
 	}
-	blocks, err := u.repo.FindBlockedUsersByUserID(userID)
+	blocks, err := u.repo.FindBlockUsersByUserID(userID)
 	if err != nil {
 		return nil, err
 	}

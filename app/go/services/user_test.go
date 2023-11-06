@@ -3,8 +3,8 @@ package services
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"problem1/mocks"
 	"problem1/models"
-	"problem1/repository"
 	"strconv"
 	"testing"
 )
@@ -25,7 +25,7 @@ func getUserRepositoryMock() (IUserRepository, []*models.User) {
 	users[2].Friends = []*models.User{users[1], users[3], users[4], users[5]}
 	users[3].Friends = []*models.User{users[1], users[2]}
 	users[4].Friends = []*models.User{users[2]}
-	return &repository.IUserRepositoryMock{
+	return &mocks.IUserRepositoryMock{
 		FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
 			if userID < 0 || userID >= TotalUsersOfMockRepository {
 				return nil, ErrUserNotFound
@@ -35,7 +35,7 @@ func getUserRepositoryMock() (IUserRepository, []*models.User) {
 			}
 			return users[userID].Friends, nil
 		},
-		FindBlockedUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
+		FindBlockUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
 			if userID < 0 || userID >= TotalUsersOfMockRepository {
 				return nil, ErrUserNotFound
 			}
@@ -194,11 +194,12 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 	}
 	mockRepository, users := getUserRepositoryMock()
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []*models.User
-		wantErr bool
+		name        string
+		fields      fields
+		args        args
+		want        []*models.User
+		wantErr     bool
+		assertCalls func(mock *mocks.IUserRepositoryMock)
 	}{
 		{
 			name: "success",
@@ -208,24 +209,31 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 			args:    args{userID: 1, page: 1, limit: 5},
 			want:    []*models.User{users[4]},
 			wantErr: false,
+			assertCalls: func(mock *mocks.IUserRepositoryMock) {
+				calls := mock.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationCalls()
+				assert.Equal(t, 1, len(calls))
+				assert.Equal(t, []int{2, 3, 5}, calls[0].ExcludedUserIDs)
+			},
 		},
 		{
 			name: "no user",
 			fields: fields{
 				repo: mockRepository,
 			},
-			args:    args{userID: TotalUsersOfMockRepository + 1, page: 1, limit: 5},
-			want:    nil,
-			wantErr: true,
+			args:        args{userID: TotalUsersOfMockRepository + 1, page: 1, limit: 5},
+			want:        nil,
+			wantErr:     true,
+			assertCalls: nil,
 		},
 		{
 			name: "no friends",
 			fields: fields{
 				repo: mockRepository,
 			},
-			args:    args{userID: 0, page: 1, limit: 5},
-			want:    []*models.User{},
-			wantErr: false,
+			args:        args{userID: 0, page: 1, limit: 5},
+			want:        []*models.User{},
+			wantErr:     false,
+			assertCalls: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -240,6 +248,9 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 				require.NoError(t, err)
 			}
 			assert.Equal(t, tt.want, got)
+			if tt.assertCalls != nil {
+				tt.assertCalls(tt.fields.repo.(*mocks.IUserRepositoryMock))
+			}
 		})
 	}
 }

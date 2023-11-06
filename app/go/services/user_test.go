@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"problem1/models"
@@ -162,17 +161,6 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 }
 
 func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
-	generateUsers := func(n int) []*models.User {
-		var users []*models.User
-		for i := 0; i < n; i++ {
-			users = append(users, &models.User{
-				ID:      uint64(i),
-				Name:    fmt.Sprintf("User%d", i),
-				Friends: nil,
-			})
-		}
-		return users
-	}
 	type fields struct {
 		repo IUserRepository
 	}
@@ -193,12 +181,15 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 			fields: fields{
 				repo: &repository.IUserRepositoryMock{
 					FindFriendsOfFriendsPagingByUserIDFunc: func(userID int, page int, limit int) ([]*models.User, error) {
-						return generateUsers(limit), nil
+						return []*models.User{
+							{ID: 2, Name: "User2", Friends: nil},
+							{ID: 3, Name: "User3", Friends: nil},
+						}, nil
 					},
 				},
 			},
 			args:    args{userID: 1, page: 1, limit: 5},
-			want:    generateUsers(5),
+			want:    []*models.User{{ID: 2, Name: "User2", Friends: nil}, {ID: 3, Name: "User3", Friends: nil}},
 			wantErr: false,
 		},
 		{

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gorm.io/gorm/logger"
 	"log"
 	"net/http"
 	"problem1/configs"
@@ -31,7 +32,9 @@ func getDBConnection(c configs.DBConfig) (*gorm.DB, error) {
 
 	var err error
 	for i := 0; i < maxRetries; i++ {
-		db, err := gorm.Open(mysql.Open(mysqlConfig.FormatDSN()), &gorm.Config{})
+		db, err := gorm.Open(mysql.Open(mysqlConfig.FormatDSN()), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		})
 		if err == nil {
 			return db, nil
 		}

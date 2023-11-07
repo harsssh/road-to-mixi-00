@@ -12,7 +12,7 @@ type IUserRepository interface {
 	) ([]*models.User, error)
 }
 
-//go:generate go run github.com/matryer/moq -pkg mocks -skip-ensure -out ./mocks/user_service_mock.go . IUserService
+//go:generate go run github.com/matryer/moq -pkg mocks -skip-ensure -out ../mocks/user_service_mock.go . IUserService
 type IUserService interface {
 	GetFriendList(userID int) ([]*models.User, error)
 	GetFriendOfFriendList(userID int) ([]*models.User, error)

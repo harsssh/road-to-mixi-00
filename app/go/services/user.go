@@ -13,7 +13,7 @@ func NewUserService(r IUserRepository) *UserService {
 }
 
 func excludeUsers(users []*models.User, excluded []*models.User) []*models.User {
-	excludedMap := make(map[uint64]bool)
+	excludedMap := make(map[int64]bool)
 	for _, user := range excluded {
 		excludedMap[user.ID] = true
 	}

@@ -1,39 +1,33 @@
 package repository
 
 import (
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 	"problem1/models"
 )
 
 type UserRepository struct {
-	db *gorm.DB
+	db *sqlx.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
+func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db}
 }
 
 func (u *UserRepository) FindFriendsByUserID(userID int) ([]*models.User, error) {
-	//TODO implement me
 	panic("implement me")
 }
 
-func (u *UserRepository) FindBlockedUsersByUserID(userID int) ([]*models.User, error) {
-	//TODO implement me
+func (u *UserRepository) FindBlockUsersByUserID(userID int) ([]*models.User, error) {
 	panic("implement me")
 }
 
+// FindFriendsOfFriendsByUserID does not exclude blocked users etc.
 func (u *UserRepository) FindFriendsOfFriendsByUserID(userID int) ([]*models.User, error) {
-	//TODO implement me
 	panic("implement me")
 }
 
-func (u *UserRepository) FindUsersByIDs(userIDs []int) ([]*models.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *UserRepository) FindUsersByIDsPaging(userIDs []int, page int, limit int) ([]*models.User, error) {
-	//TODO implement me
+func (u *UserRepository) FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination(
+	userID int, excludedUserIDs []int, page int, limit int,
+) ([]*models.User, error) {
 	panic("implement me")
 }

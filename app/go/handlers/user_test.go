@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"problem1/mocks"
 	"problem1/models"
 	"problem1/services"
-	"problem1/services/mocks"
 	"testing"
 )
 

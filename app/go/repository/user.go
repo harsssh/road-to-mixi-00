@@ -125,31 +125,25 @@ func (u *UserRepository) FindFriendsOfFriendsByID(id int64) ([]*models.User, err
 	}
 
 	var friendsOfFriends []*models.User
-	friendIDs, err := u.findFriendIDsByID(id)
 	if err != nil {
 		return nil, err
 	}
-	arg := map[string]interface{}{
-		"id":         id,
-		"friend_ids": friendIDs,
-	}
 	query := `
-		SELECT u.id, u.user_id, u.name
-		FROM users AS u
-		WHERE
-		    u.id != :id AND
-		    u.id IN (
-				SELECT fl.user2_id
-				FROM friend_link AS fl
-				WHERE fl.user1_id IN (:friend_ids)
-				UNION 
-				SELECT fl.user1_id
-				FROM friend_link AS fl
-				WHERE fl.user2_id IN (:friend_ids)
-			)
-		ORDER BY u.id
+		SELECT u2.id, u2.user_id, u2.name
+		FROM friend_link AS fl1
+		JOIN users AS u1
+			ON (fl1.user1_id = :id OR fl1.user2_id = :id) AND
+			   u1.id = IF(fl1.user1_id = :id, fl1.user2_id, fl1.user1_id)
+		JOIN friend_link AS fl2
+		    ON fl2.user1_id != :id AND fl2.user2_id != :id AND
+		       (fl2.user1_id = u1.id OR fl2.user2_id = u1.id)
+		JOIN users AS u2
+			ON u2.id != :id AND
+			   (fl2.user1_id = u1.id OR fl2.user2_id = u1.id) AND
+			   u2.id = IF(fl2.user1_id = u1.id, fl2.user2_id, fl2.user1_id)
+		ORDER BY u2.id
 	`
-	query, args, err := sqlx.Named(query, arg)
+	query, args, err := sqlx.Named(query, models.User{ID: id})
 	if err != nil {
 		return nil, err
 	}

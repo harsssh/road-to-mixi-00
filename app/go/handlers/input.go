@@ -2,14 +2,8 @@ package handlers
 
 import (
 	"github.com/labstack/echo/v4"
-	"problem1/models"
 	"strconv"
 )
-
-type FriendListEntry struct {
-	UserID int    `json:"user_id"`
-	Name   string `json:"name"`
-}
 
 func getID(c echo.Context) (int64, error) {
 	id, err := strconv.ParseInt(c.QueryParam("id"), 10, 64)
@@ -45,15 +39,4 @@ func getPaginationParams(c echo.Context) (PaginationParams, error) {
 		Page:  page,
 		Limit: limit,
 	}, nil
-}
-
-func convertToFriendList(users []*models.User) []*FriendListEntry {
-	friends := make([]*FriendListEntry, len(users))
-	for i, user := range users {
-		friends[i] = &FriendListEntry{
-			UserID: user.UserID,
-			Name:   user.Name,
-		}
-	}
-	return friends
 }

@@ -48,7 +48,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 			want: response{
 				status:    http.StatusOK,
 				checkBody: true,
-				body:      `[{"user_id":10,"name":"user1"},{"user_id":20,"name":"user2"}]`,
+				body:      `[{"id":1,"name":"user1"},{"id":2,"name":"user2"}]`,
 			},
 		},
 		{
@@ -207,7 +207,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 			want: response{
 				status:    http.StatusOK,
 				checkBody: true,
-				body:      `[{"user_id":10,"name":"user1"},{"user_id":20,"name":"user2"}]`,
+				body:      `[{"id":1,"name":"user1"},{"id":2,"name":"user2"}]`,
 			},
 		},
 		{
@@ -370,7 +370,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			want: response{
 				status:    http.StatusOK,
 				checkBody: true,
-				body:      `[{"user_id":10,"name":"user1"},{"user_id":20,"name":"user2"}]`,
+				body:      `[{"id":1,"name":"user1"},{"id":2,"name":"user2"}]`,
 			},
 		},
 		{

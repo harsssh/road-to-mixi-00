@@ -32,10 +32,10 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 			name: "success",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendListFunc: func(id int64) ([]*models.User, error) {
 						return []*models.User{
-							{UserID: 2, Name: "User2"},
-							{UserID: 3, Name: "User3"},
+							{ID: 1, UserID: 10, Name: "user1"},
+							{ID: 2, UserID: 20, Name: "user2"},
 						}, nil
 					},
 				},
@@ -48,7 +48,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 			want: response{
 				status:    http.StatusOK,
 				checkBody: true,
-				body:      `[{"user_id":2,"name":"User2"},{"user_id":3,"name":"User3"}]`,
+				body:      `[{"user_id":10,"name":"user1"},{"user_id":20,"name":"user2"}]`,
 			},
 		},
 		{
@@ -100,7 +100,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 			name: "no user",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendListFunc: func(id int64) ([]*models.User, error) {
 						return nil, services.ErrUserNotFound
 					},
 				},
@@ -119,7 +119,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 			name: "no friends",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendListFunc: func(id int64) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
 				},
@@ -139,7 +139,7 @@ func TestUserHandler_GetFriendList(t *testing.T) {
 			name: "service error",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendListFunc: func(id int64) ([]*models.User, error) {
 						return nil, fmt.Errorf("error")
 					},
 				},
@@ -191,10 +191,10 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 			name: "success",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendOfFriendListFunc: func(id int64) ([]*models.User, error) {
 						return []*models.User{
-							{UserID: 2, Name: "User2"},
-							{UserID: 3, Name: "User3"},
+							{ID: 1, UserID: 10, Name: "user1"},
+							{ID: 2, UserID: 20, Name: "user2"},
 						}, nil
 					},
 				},
@@ -207,7 +207,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 			want: response{
 				status:    http.StatusOK,
 				checkBody: true,
-				body:      `[{"user_id":2,"name":"User2"},{"user_id":3,"name":"User3"}]`,
+				body:      `[{"user_id":10,"name":"user1"},{"user_id":20,"name":"user2"}]`,
 			},
 		},
 		{
@@ -259,7 +259,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 			name: "no user",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendOfFriendListFunc: func(id int64) ([]*models.User, error) {
 						return nil, services.ErrUserNotFound
 					},
 				},
@@ -278,7 +278,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 			name: "no friends",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendOfFriendListFunc: func(id int64) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
 				},
@@ -298,7 +298,7 @@ func TestUserHandler_GetFriendOfFriendList(t *testing.T) {
 			name: "service error",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
+					GetFriendOfFriendListFunc: func(id int64) ([]*models.User, error) {
 						return nil, fmt.Errorf("error")
 					},
 				},
@@ -350,10 +350,10 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			name: "success",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+					GetFriendOfFriendListPagingFunc: func(id int64, page int, limit int) ([]*models.User, error) {
 						return []*models.User{
-							{UserID: 2, Name: "User2"},
-							{UserID: 3, Name: "User3"},
+							{ID: 1, UserID: 10, Name: "user1"},
+							{ID: 2, UserID: 20, Name: "user2"},
 						}, nil
 					},
 				},
@@ -370,7 +370,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			want: response{
 				status:    http.StatusOK,
 				checkBody: true,
-				body:      `[{"user_id":2,"name":"User2"},{"user_id":3,"name":"User3"}]`,
+				body:      `[{"user_id":10,"name":"user1"},{"user_id":20,"name":"user2"}]`,
 			},
 		},
 		{
@@ -434,7 +434,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			name: "no user",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+					GetFriendOfFriendListPagingFunc: func(id int64, page int, limit int) ([]*models.User, error) {
 						return nil, services.ErrUserNotFound
 					},
 				},
@@ -457,7 +457,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			name: "no friends",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+					GetFriendOfFriendListPagingFunc: func(id int64, page int, limit int) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
 				},
@@ -481,7 +481,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			name: "service error",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+					GetFriendOfFriendListPagingFunc: func(id int64, page int, limit int) ([]*models.User, error) {
 						return nil, fmt.Errorf("error")
 					},
 				},
@@ -504,7 +504,7 @@ func TestUserHandler_GetFriendOfFriendListPaging(t *testing.T) {
 			name: "default page and limit",
 			fields: fields{
 				service: &mocks.IUserServiceMock{
-					GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+					GetFriendOfFriendListPagingFunc: func(id int64, page int, limit int) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
 				},

@@ -19,12 +19,12 @@ func getUsers(n int) []*models.User {
 	return users
 }
 
-func TestUserService_GetFriendsByUserID(t *testing.T) {
+func TestUserService_GetFriendsByID(t *testing.T) {
 	type fields struct {
 		repo IUserRepository
 	}
 	type args struct {
-		userID int
+		id int64
 	}
 	users := getUsers(totalUser)
 	tests := []struct {
@@ -38,12 +38,12 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 			name: "success",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return users, nil
 					},
 				},
 			},
-			args:    args{userID: 1},
+			args:    args{id: 1},
 			want:    users,
 			wantErr: false,
 		},
@@ -51,12 +51,12 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 			name: "no user",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, ErrUserNotFound
 					},
 				},
 			},
-			args:    args{userID: 1},
+			args:    args{id: 1},
 			want:    nil,
 			wantErr: true,
 		},
@@ -64,12 +64,12 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 			name: "no friends",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
 				},
 			},
-			args:    args{userID: 1},
+			args:    args{id: 1},
 			want:    []*models.User{},
 			wantErr: false,
 		},
@@ -79,7 +79,7 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 			u := &UserService{
 				repo: tt.fields.repo,
 			}
-			got, err := u.GetFriendList(tt.args.userID)
+			got, err := u.GetFriendList(tt.args.id)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -90,12 +90,12 @@ func TestUserService_GetFriendsByUserID(t *testing.T) {
 	}
 }
 
-func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
+func TestUserService_GetFriendsOfFriendsByID(t *testing.T) {
 	type fields struct {
 		repo IUserRepository
 	}
 	type args struct {
-		userID int
+		id int64
 	}
 	users := getUsers(totalUser)
 	tests := []struct {
@@ -109,18 +109,18 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 			name: "success",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsOfFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return users, nil
 					},
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return users[:1], nil
 					},
-					FindBlockUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindBlockUsersByIDFunc: func(id int64) ([]*models.User, error) {
 						return users[1:2], nil
 					},
 				},
 			},
-			args:    args{userID: 1},
+			args:    args{id: 1},
 			want:    users[2:],
 			wantErr: false,
 		},
@@ -128,18 +128,18 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 			name: "no user",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsOfFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, ErrUserNotFound
 					},
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
-					FindBlockUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindBlockUsersByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
 				},
 			},
-			args:    args{userID: 1},
+			args:    args{id: 1},
 			want:    nil,
 			wantErr: true,
 		},
@@ -147,18 +147,18 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 			name: "no friends",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsOfFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsOfFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
-					FindBlockUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindBlockUsersByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
 				},
 			},
-			args:    args{userID: 1},
+			args:    args{id: 1},
 			want:    []*models.User{},
 			wantErr: false,
 		},
@@ -168,7 +168,7 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 			u := &UserService{
 				repo: tt.fields.repo,
 			}
-			got, err := u.GetFriendOfFriendList(tt.args.userID)
+			got, err := u.GetFriendOfFriendList(tt.args.id)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -179,14 +179,14 @@ func TestUserService_GetFriendsOfFriendsByUserID(t *testing.T) {
 	}
 }
 
-func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
+func TestUserService_GetFriendsOfFriendsPagingByID(t *testing.T) {
 	type fields struct {
 		repo IUserRepository
 	}
 	type args struct {
-		userID int
-		page   int
-		limit  int
+		id    int64
+		page  int
+		limit int
 	}
 	users := getUsers(totalUser)
 	tests := []struct {
@@ -201,46 +201,46 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 			name: "success",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return users[:1], nil
 					},
-					FindBlockUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindBlockUsersByIDFunc: func(id int64) ([]*models.User, error) {
 						return users[1:2], nil
 					},
-					FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc: func(
-						userID int, excludedUserIDs []int, page int, limit int,
+					FindFriendsOfFriendsExcludingSomeUsersByIDWithPaginationFunc: func(
+						id int64, excludeIDs []int64, page int, limit int,
 					) ([]*models.User, error) {
 						return users[2:], nil
 					},
 				},
 			},
-			args:    args{userID: 1, page: 1, limit: 5},
+			args:    args{id: 1, page: 1, limit: 5},
 			want:    users[2:],
 			wantErr: false,
 			assertCalls: func(mock *mocks.IUserRepositoryMock) {
-				calls := mock.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationCalls()
+				calls := mock.FindFriendsOfFriendsExcludingSomeUsersByIDWithPaginationCalls()
 				assert.Equal(t, 1, len(calls))
-				assert.Equal(t, []int{0, 1}, calls[0].ExcludedUserIDs)
+				assert.Equal(t, []int64{0, 1}, calls[0].ExcludeIDs)
 			},
 		},
 		{
 			name: "no user",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
-					FindBlockUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindBlockUsersByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
-					FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc: func(
-						userID int, excludedUserIDs []int, page int, limit int,
+					FindFriendsOfFriendsExcludingSomeUsersByIDWithPaginationFunc: func(
+						id int64, excludeIDs []int64, page int, limit int,
 					) ([]*models.User, error) {
 						return nil, ErrUserNotFound
 					},
 				},
 			},
-			args:        args{userID: 1, page: 1, limit: 5},
+			args:        args{id: 1, page: 1, limit: 5},
 			want:        nil,
 			wantErr:     true,
 			assertCalls: nil,
@@ -249,20 +249,20 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 			name: "no friends",
 			fields: fields{
 				repo: &mocks.IUserRepositoryMock{
-					FindFriendsByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindFriendsByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
-					FindBlockUsersByUserIDFunc: func(userID int) ([]*models.User, error) {
+					FindBlockUsersByIDFunc: func(id int64) ([]*models.User, error) {
 						return nil, nil
 					},
-					FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPaginationFunc: func(
-						userID int, excludedUserIDs []int, page int, limit int,
+					FindFriendsOfFriendsExcludingSomeUsersByIDWithPaginationFunc: func(
+						id int64, excludeIDs []int64, page int, limit int,
 					) ([]*models.User, error) {
 						return []*models.User{}, nil
 					},
 				},
 			},
-			args:        args{userID: 1, page: 1, limit: 5},
+			args:        args{id: 1, page: 1, limit: 5},
 			want:        []*models.User{},
 			wantErr:     false,
 			assertCalls: nil,
@@ -273,7 +273,7 @@ func TestUserService_GetFriendsOfFriendsPagingByUserID(t *testing.T) {
 			u := &UserService{
 				repo: tt.fields.repo,
 			}
-			got, err := u.GetFriendOfFriendListPaging(tt.args.userID, tt.args.page, tt.args.limit)
+			got, err := u.GetFriendOfFriendListPaging(tt.args.id, tt.args.page, tt.args.limit)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

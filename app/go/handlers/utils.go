@@ -11,12 +11,12 @@ type FriendListEntry struct {
 	Name   string `json:"name"`
 }
 
-func getUserID(c echo.Context) (int, error) {
-	userID, err := strconv.Atoi(c.QueryParam("id"))
+func getID(c echo.Context) (int64, error) {
+	id, err := strconv.ParseInt(c.QueryParam("id"), 10, 64)
 	if err != nil {
 		return 0, err
 	}
-	return userID, nil
+	return id, nil
 }
 
 func getPaginationParams(c echo.Context) (PaginationParams, error) {

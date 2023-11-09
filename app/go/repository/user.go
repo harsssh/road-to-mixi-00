@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"database/sql"
-	"errors"
 	"github.com/jmoiron/sqlx"
 	"problem1/models"
 	"problem1/services"
@@ -16,24 +14,24 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db}
 }
 
-func (u *UserRepository) findUserByUserID(userID int) (*models.User, error) {
-	var user models.User
-	query := "SELECT id, user_id, name FROM users WHERE user_id = ?"
+func (u *UserRepository) userExists(id int64) (bool, error) {
+	var exist bool
+	query := "SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)"
 	query = u.db.Rebind(query)
-	err := u.db.Get(&user, query, userID)
+	err := u.db.Get(&exist, query, id)
+	if err != nil {
+		return false, err
+	}
+	return exist, nil
+}
+
+func (u *UserRepository) FindFriendsByID(id int64) ([]*models.User, error) {
+	userExists, err := u.userExists(id)
 	if err != nil {
 		return nil, err
 	}
-	return &user, nil
-}
-
-func (u *UserRepository) FindFriendsByUserID(userID int) ([]*models.User, error) {
-	user, err := u.findUserByUserID(userID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, services.ErrUserNotFound
-		}
-		return nil, err
+	if !userExists {
+		return nil, services.ErrUserNotFound
 	}
 
 	var friends []*models.User
@@ -47,7 +45,7 @@ func (u *UserRepository) FindFriendsByUserID(userID int) ([]*models.User, error)
 		)
 		ORDER BY u.id
 	`
-	query, args, err := sqlx.Named(query, user)
+	query, args, err := sqlx.Named(query, models.User{ID: id})
 	if err != nil {
 		return nil, err
 	}
@@ -59,13 +57,13 @@ func (u *UserRepository) FindFriendsByUserID(userID int) ([]*models.User, error)
 	return friends, nil
 }
 
-func (u *UserRepository) FindBlockUsersByUserID(userID int) ([]*models.User, error) {
-	user, err := u.findUserByUserID(userID)
+func (u *UserRepository) FindBlockUsersByID(id int64) ([]*models.User, error) {
+	userExists, err := u.userExists(id)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, services.ErrUserNotFound
-		}
 		return nil, err
+	}
+	if !userExists {
+		return nil, services.ErrUserNotFound
 	}
 
 	var blocks []*models.User
@@ -79,7 +77,7 @@ func (u *UserRepository) FindBlockUsersByUserID(userID int) ([]*models.User, err
 		)
 		ORDER BY u.id
 	`
-	query, args, err := sqlx.Named(query, user)
+	query, args, err := sqlx.Named(query, models.User{ID: id})
 	if err != nil {
 		return nil, err
 	}
@@ -121,23 +119,23 @@ func (u *UserRepository) findBlockIDsByID(id int64) ([]int64, error) {
 	return blockIDs, nil
 }
 
-// FindFriendsOfFriendsByUserID does not exclude blocked users etc.
-func (u *UserRepository) FindFriendsOfFriendsByUserID(userID int) ([]*models.User, error) {
-	user, err := u.findUserByUserID(userID)
+// FindFriendsOfFriendsByID does not exclude blocked users etc.
+func (u *UserRepository) FindFriendsOfFriendsByID(id int64) ([]*models.User, error) {
+	userExists, err := u.userExists(id)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, services.ErrUserNotFound
-		}
 		return nil, err
+	}
+	if !userExists {
+		return nil, services.ErrUserNotFound
 	}
 
 	var friendsOfFriends []*models.User
-	friendIDs, err := u.findFriendIDsByID(user.ID)
+	friendIDs, err := u.findFriendIDsByID(id)
 	if err != nil {
 		return nil, err
 	}
 	arg := map[string]interface{}{
-		"id":         user.ID,
+		"id":         id,
 		"friend_ids": friendIDs,
 	}
 	query := `
@@ -172,26 +170,26 @@ func (u *UserRepository) FindFriendsOfFriendsByUserID(userID int) ([]*models.Use
 	return friendsOfFriends, nil
 }
 
-func (u *UserRepository) FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination(
-	userID int, excludedUserIDs []int, page int, limit int,
+func (u *UserRepository) FindFriendsOfFriendsExcludingSomeUsersByIDWithPagination(
+	id int64, excludeIDs []int64, page int, limit int,
 ) ([]*models.User, error) {
-	user, err := u.findUserByUserID(userID)
+	userExists, err := u.userExists(id)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, services.ErrUserNotFound
-		}
 		return nil, err
+	}
+	if !userExists {
+		return nil, services.ErrUserNotFound
 	}
 
 	var result []*models.User
-	friendIDs, err := u.findFriendIDsByID(user.ID)
+	friendIDs, err := u.findFriendIDsByID(id)
 	if err != nil {
 		return nil, err
 	}
 	arg := map[string]interface{}{
-		"id":               user.ID,
+		"id":               id,
 		"friend_ids":       friendIDs,
-		"exclude_user_ids": excludedUserIDs,
+		"exclude_user_ids": excludeIDs,
 		"limit":            limit,
 		"offset":           (page - 1) * limit,
 	}

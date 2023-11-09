@@ -14,13 +14,13 @@ import (
 //
 //		// make and configure a mocked services.IUserService
 //		mockedIUserService := &IUserServiceMock{
-//			GetFriendListFunc: func(userID int) ([]*models.User, error) {
+//			GetFriendListFunc: func(id int64) ([]*models.User, error) {
 //				panic("mock out the GetFriendList method")
 //			},
-//			GetFriendOfFriendListFunc: func(userID int) ([]*models.User, error) {
+//			GetFriendOfFriendListFunc: func(id int64) ([]*models.User, error) {
 //				panic("mock out the GetFriendOfFriendList method")
 //			},
-//			GetFriendOfFriendListPagingFunc: func(userID int, page int, limit int) ([]*models.User, error) {
+//			GetFriendOfFriendListPagingFunc: func(id int64, page int, limit int) ([]*models.User, error) {
 //				panic("mock out the GetFriendOfFriendListPaging method")
 //			},
 //		}
@@ -31,30 +31,30 @@ import (
 //	}
 type IUserServiceMock struct {
 	// GetFriendListFunc mocks the GetFriendList method.
-	GetFriendListFunc func(userID int) ([]*models.User, error)
+	GetFriendListFunc func(id int64) ([]*models.User, error)
 
 	// GetFriendOfFriendListFunc mocks the GetFriendOfFriendList method.
-	GetFriendOfFriendListFunc func(userID int) ([]*models.User, error)
+	GetFriendOfFriendListFunc func(id int64) ([]*models.User, error)
 
 	// GetFriendOfFriendListPagingFunc mocks the GetFriendOfFriendListPaging method.
-	GetFriendOfFriendListPagingFunc func(userID int, page int, limit int) ([]*models.User, error)
+	GetFriendOfFriendListPagingFunc func(id int64, page int, limit int) ([]*models.User, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
 		// GetFriendList holds details about calls to the GetFriendList method.
 		GetFriendList []struct {
-			// UserID is the userID argument value.
-			UserID int
+			// ID is the id argument value.
+			ID int64
 		}
 		// GetFriendOfFriendList holds details about calls to the GetFriendOfFriendList method.
 		GetFriendOfFriendList []struct {
-			// UserID is the userID argument value.
-			UserID int
+			// ID is the id argument value.
+			ID int64
 		}
 		// GetFriendOfFriendListPaging holds details about calls to the GetFriendOfFriendListPaging method.
 		GetFriendOfFriendListPaging []struct {
-			// UserID is the userID argument value.
-			UserID int
+			// ID is the id argument value.
+			ID int64
 			// Page is the page argument value.
 			Page int
 			// Limit is the limit argument value.
@@ -67,19 +67,19 @@ type IUserServiceMock struct {
 }
 
 // GetFriendList calls GetFriendListFunc.
-func (mock *IUserServiceMock) GetFriendList(userID int) ([]*models.User, error) {
+func (mock *IUserServiceMock) GetFriendList(id int64) ([]*models.User, error) {
 	if mock.GetFriendListFunc == nil {
 		panic("IUserServiceMock.GetFriendListFunc: method is nil but IUserService.GetFriendList was just called")
 	}
 	callInfo := struct {
-		UserID int
+		ID int64
 	}{
-		UserID: userID,
+		ID: id,
 	}
 	mock.lockGetFriendList.Lock()
 	mock.calls.GetFriendList = append(mock.calls.GetFriendList, callInfo)
 	mock.lockGetFriendList.Unlock()
-	return mock.GetFriendListFunc(userID)
+	return mock.GetFriendListFunc(id)
 }
 
 // GetFriendListCalls gets all the calls that were made to GetFriendList.
@@ -87,10 +87,10 @@ func (mock *IUserServiceMock) GetFriendList(userID int) ([]*models.User, error) 
 //
 //	len(mockedIUserService.GetFriendListCalls())
 func (mock *IUserServiceMock) GetFriendListCalls() []struct {
-	UserID int
+	ID int64
 } {
 	var calls []struct {
-		UserID int
+		ID int64
 	}
 	mock.lockGetFriendList.RLock()
 	calls = mock.calls.GetFriendList
@@ -99,19 +99,19 @@ func (mock *IUserServiceMock) GetFriendListCalls() []struct {
 }
 
 // GetFriendOfFriendList calls GetFriendOfFriendListFunc.
-func (mock *IUserServiceMock) GetFriendOfFriendList(userID int) ([]*models.User, error) {
+func (mock *IUserServiceMock) GetFriendOfFriendList(id int64) ([]*models.User, error) {
 	if mock.GetFriendOfFriendListFunc == nil {
 		panic("IUserServiceMock.GetFriendOfFriendListFunc: method is nil but IUserService.GetFriendOfFriendList was just called")
 	}
 	callInfo := struct {
-		UserID int
+		ID int64
 	}{
-		UserID: userID,
+		ID: id,
 	}
 	mock.lockGetFriendOfFriendList.Lock()
 	mock.calls.GetFriendOfFriendList = append(mock.calls.GetFriendOfFriendList, callInfo)
 	mock.lockGetFriendOfFriendList.Unlock()
-	return mock.GetFriendOfFriendListFunc(userID)
+	return mock.GetFriendOfFriendListFunc(id)
 }
 
 // GetFriendOfFriendListCalls gets all the calls that were made to GetFriendOfFriendList.
@@ -119,10 +119,10 @@ func (mock *IUserServiceMock) GetFriendOfFriendList(userID int) ([]*models.User,
 //
 //	len(mockedIUserService.GetFriendOfFriendListCalls())
 func (mock *IUserServiceMock) GetFriendOfFriendListCalls() []struct {
-	UserID int
+	ID int64
 } {
 	var calls []struct {
-		UserID int
+		ID int64
 	}
 	mock.lockGetFriendOfFriendList.RLock()
 	calls = mock.calls.GetFriendOfFriendList
@@ -131,23 +131,23 @@ func (mock *IUserServiceMock) GetFriendOfFriendListCalls() []struct {
 }
 
 // GetFriendOfFriendListPaging calls GetFriendOfFriendListPagingFunc.
-func (mock *IUserServiceMock) GetFriendOfFriendListPaging(userID int, page int, limit int) ([]*models.User, error) {
+func (mock *IUserServiceMock) GetFriendOfFriendListPaging(id int64, page int, limit int) ([]*models.User, error) {
 	if mock.GetFriendOfFriendListPagingFunc == nil {
 		panic("IUserServiceMock.GetFriendOfFriendListPagingFunc: method is nil but IUserService.GetFriendOfFriendListPaging was just called")
 	}
 	callInfo := struct {
-		UserID int
-		Page   int
-		Limit  int
+		ID    int64
+		Page  int
+		Limit int
 	}{
-		UserID: userID,
-		Page:   page,
-		Limit:  limit,
+		ID:    id,
+		Page:  page,
+		Limit: limit,
 	}
 	mock.lockGetFriendOfFriendListPaging.Lock()
 	mock.calls.GetFriendOfFriendListPaging = append(mock.calls.GetFriendOfFriendListPaging, callInfo)
 	mock.lockGetFriendOfFriendListPaging.Unlock()
-	return mock.GetFriendOfFriendListPagingFunc(userID, page, limit)
+	return mock.GetFriendOfFriendListPagingFunc(id, page, limit)
 }
 
 // GetFriendOfFriendListPagingCalls gets all the calls that were made to GetFriendOfFriendListPaging.
@@ -155,14 +155,14 @@ func (mock *IUserServiceMock) GetFriendOfFriendListPaging(userID int, page int, 
 //
 //	len(mockedIUserService.GetFriendOfFriendListPagingCalls())
 func (mock *IUserServiceMock) GetFriendOfFriendListPagingCalls() []struct {
-	UserID int
-	Page   int
-	Limit  int
+	ID    int64
+	Page  int
+	Limit int
 } {
 	var calls []struct {
-		UserID int
-		Page   int
-		Limit  int
+		ID    int64
+		Page  int
+		Limit int
 	}
 	mock.lockGetFriendOfFriendListPaging.RLock()
 	calls = mock.calls.GetFriendOfFriendListPaging

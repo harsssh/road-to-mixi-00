@@ -16,12 +16,12 @@ func NewUserHandler(s services.IUserService) *UserHandler {
 }
 
 func (h *UserHandler) GetFriendList(c echo.Context) error {
-	userID, err := getUserID(c)
-	if err != nil || userID < 0 {
+	id, err := getID(c)
+	if err != nil || id < 0 {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	friends, err := h.service.GetFriendList(userID)
+	friends, err := h.service.GetFriendList(id)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			return c.NoContent(http.StatusNotFound)
@@ -33,12 +33,12 @@ func (h *UserHandler) GetFriendList(c echo.Context) error {
 }
 
 func (h *UserHandler) GetFriendOfFriendList(c echo.Context) error {
-	userID, err := getUserID(c)
-	if err != nil || userID < 0 {
+	id, err := getID(c)
+	if err != nil || id < 0 {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	friends, err := h.service.GetFriendOfFriendList(userID)
+	friends, err := h.service.GetFriendOfFriendList(id)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			return c.NoContent(http.StatusNotFound)
@@ -50,8 +50,8 @@ func (h *UserHandler) GetFriendOfFriendList(c echo.Context) error {
 }
 
 func (h *UserHandler) GetFriendOfFriendListPaging(c echo.Context) error {
-	userID, err := getUserID(c)
-	if err != nil || userID < 0 {
+	id, err := getID(c)
+	if err != nil || id < 0 {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	params, err := getPaginationParams(c)
@@ -59,7 +59,7 @@ func (h *UserHandler) GetFriendOfFriendListPaging(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	friends, err := h.service.GetFriendOfFriendListPaging(userID, params.Page, params.Limit)
+	friends, err := h.service.GetFriendOfFriendListPaging(id, params.Page, params.Limit)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			return c.NoContent(http.StatusNotFound)

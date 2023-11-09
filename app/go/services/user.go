@@ -27,28 +27,28 @@ func excludeUsers(users []*models.User, excluded []*models.User) []*models.User 
 	return result
 }
 
-func (u *UserService) GetFriendList(userID int) ([]*models.User, error) {
-	return u.repo.FindFriendsByUserID(userID)
+func (u *UserService) GetFriendList(id int64) ([]*models.User, error) {
+	return u.repo.FindFriendsByID(id)
 }
 
-func (u *UserService) getUsersToExcludeForFriendsOfFriends(userID int) ([]*models.User, error) {
-	friends, err := u.repo.FindFriendsByUserID(userID)
+func (u *UserService) getUsersToExcludeForFriendsOfFriends(id int64) ([]*models.User, error) {
+	friends, err := u.repo.FindFriendsByID(id)
 	if err != nil {
 		return nil, err
 	}
-	blocks, err := u.repo.FindBlockUsersByUserID(userID)
+	blocks, err := u.repo.FindBlockUsersByID(id)
 	if err != nil {
 		return nil, err
 	}
 	return append(friends, blocks...), nil
 }
 
-func (u *UserService) GetFriendOfFriendList(userID int) ([]*models.User, error) {
-	friendsOfFriends, err := u.repo.FindFriendsOfFriendsByUserID(userID)
+func (u *UserService) GetFriendOfFriendList(id int64) ([]*models.User, error) {
+	friendsOfFriends, err := u.repo.FindFriendsOfFriendsByID(id)
 	if err != nil {
 		return nil, err
 	}
-	usersToExclude, err := u.getUsersToExcludeForFriendsOfFriends(userID)
+	usersToExclude, err := u.getUsersToExcludeForFriendsOfFriends(id)
 	if err != nil {
 		return nil, err
 	}
@@ -56,17 +56,17 @@ func (u *UserService) GetFriendOfFriendList(userID int) ([]*models.User, error) 
 	return result, nil
 }
 
-func (u *UserService) GetFriendOfFriendListPaging(userID int, page int, limit int) ([]*models.User, error) {
-	usersToExclude, err := u.getUsersToExcludeForFriendsOfFriends(userID)
+func (u *UserService) GetFriendOfFriendListPaging(id int64, page int, limit int) ([]*models.User, error) {
+	usersToExclude, err := u.getUsersToExcludeForFriendsOfFriends(id)
 	if err != nil {
 		return nil, err
 	}
-	userIDsToExclude := make([]int, len(usersToExclude))
+	excludeIDs := make([]int64, len(usersToExclude))
 	for i, user := range usersToExclude {
-		userIDsToExclude[i] = user.UserID
+		excludeIDs[i] = user.ID
 	}
-	result, err := u.repo.FindFriendsOfFriendsExcludingSomeUsersByUserIDWithPagination(
-		userID, userIDsToExclude, page, limit,
+	result, err := u.repo.FindFriendsOfFriendsExcludingSomeUsersByIDWithPagination(
+		id, excludeIDs, page, limit,
 	)
 	if err != nil {
 		return nil, err

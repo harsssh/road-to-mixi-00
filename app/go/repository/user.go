@@ -68,11 +68,8 @@ func (u *UserRepository) FindBlockUsersByID(id int64) ([]*models.User, error) {
 	query := `
 		SELECT u.id, u.user_id, u.name 
 		FROM users AS u
-		WHERE u.id IN (
-		    SELECT bl.user2_id 
-		    FROM block_list AS bl
-		    WHERE user1_id = :id
-		)
+		JOIN block_list AS bl
+			ON bl.user1_id = :id AND bl.user2_id = u.id
 		ORDER BY u.id
 	`
 	query, args, err := sqlx.Named(query, models.User{ID: id})

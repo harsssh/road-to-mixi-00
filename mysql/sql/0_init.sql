@@ -9,7 +9,8 @@ CREATE TABLE `friend_link` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `user1_id` int(11) NOT NULL,
   `user2_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `idx_user1_id_user2_id` (`user1_id`, `user2_id`)
 );
 -- user1 user2 block
 CREATE TABLE `block_list` (

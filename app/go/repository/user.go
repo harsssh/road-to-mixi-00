@@ -37,12 +37,10 @@ func (u *UserRepository) FindFriendsByID(id int64) ([]*models.User, error) {
 	var friends []*models.User
 	query := `
 		SELECT u.id, u.user_id, u.name
-		FROM users AS u 
-		WHERE u.id IN (
-			SELECT IF(fl.user1_id = :id, fl.user2_id, fl.user1_id)
-			FROM friend_link AS fl
-			WHERE fl.user1_id = :id OR fl.user2_id = :id
-		)
+		FROM friend_link AS fl
+		JOIN users AS u
+			ON (fl.user1_id = :id OR fl.user2_id = :id) AND
+			    u.id = IF(fl.user1_id = :id, fl.user2_id, fl.user1_id)
 		ORDER BY u.id
 	`
 	query, args, err := sqlx.Named(query, models.User{ID: id})

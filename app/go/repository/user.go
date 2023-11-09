@@ -84,36 +84,6 @@ func (u *UserRepository) FindBlockUsersByID(id int64) ([]*models.User, error) {
 	return blocks, nil
 }
 
-func (u *UserRepository) findFriendIDsByID(id int64) ([]int64, error) {
-	var friendIDs []int64
-	query := `
-		SELECT IF(fl.user1_id = :id, fl.user2_id, fl.user1_id)
-		FROM friend_link AS fl
-		WHERE fl.user1_id = :id OR fl.user2_id = :id
-	`
-	query, args, err := sqlx.Named(query, models.User{ID: id})
-	if err != nil {
-		return nil, err
-	}
-	query = u.db.Rebind(query)
-	err = u.db.Select(&friendIDs, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	return friendIDs, nil
-}
-
-func (u *UserRepository) findBlockIDsByID(id int64) ([]int64, error) {
-	var blockIDs []int64
-	query := "SELECT user2_id FROM block_list WHERE user1_id = ?"
-	query = u.db.Rebind(query)
-	err := u.db.Select(&blockIDs, query, id)
-	if err != nil {
-		return nil, err
-	}
-	return blockIDs, nil
-}
-
 // FindFriendsOfFriendsByID does not exclude blocked users etc.
 func (u *UserRepository) FindFriendsOfFriendsByID(id int64) ([]*models.User, error) {
 	userExists, err := u.userExists(id)
@@ -171,33 +141,30 @@ func (u *UserRepository) FindFriendsOfFriendsExcludingSomeUsersByIDWithPaginatio
 	}
 
 	var result []*models.User
-	friendIDs, err := u.findFriendIDsByID(id)
 	if err != nil {
 		return nil, err
 	}
 	arg := map[string]interface{}{
-		"id":               id,
-		"friend_ids":       friendIDs,
-		"exclude_user_ids": excludeIDs,
-		"limit":            limit,
-		"offset":           (page - 1) * limit,
+		"id":          id,
+		"exclude_ids": excludeIDs,
+		"limit":       limit,
+		"offset":      (page - 1) * limit,
 	}
 	query := `
-		SELECT u.id, u.user_id, u.name
-		FROM users AS u
-		WHERE
-		    u.id != :id AND
-		    u.id NOT IN (:exclude_user_ids) AND
-		    u.id IN (
-		        SELECT fl.user2_id
-		        FROM friend_link AS fl
-		        WHERE fl.user1_id IN (:friend_ids)
-		        UNION
-		        SELECT fl.user1_id
-		        FROM friend_link AS fl
-		        WHERE fl.user2_id IN (:friend_ids)
-		    )
-		ORDER BY u.id
+		SELECT u2.id, u2.user_id, u2.name
+		FROM friend_link AS fl1
+		JOIN users AS u1
+			ON (fl1.user1_id = :id OR fl1.user2_id = :id) AND
+			   u1.id = IF(fl1.user1_id = :id, fl1.user2_id, fl1.user1_id)
+		JOIN friend_link AS fl2
+		    ON fl2.user1_id != :id AND fl2.user2_id != :id AND
+		       (fl2.user1_id = u1.id OR fl2.user2_id = u1.id)
+		JOIN users AS u2
+			ON u2.id != :id AND
+			   u2.id NOT IN (:exclude_ids) AND
+			   (fl2.user1_id = u1.id OR fl2.user2_id = u1.id) AND
+			   u2.id = IF(fl2.user1_id = u1.id, fl2.user2_id, fl2.user1_id)
+		ORDER BY u2.id
 		LIMIT :limit OFFSET :offset
 	`
 	query, args, err := sqlx.Named(query, arg)
